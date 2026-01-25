@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [{ "command": "node .cursor/scripts/hook.js beforeSubmitPrompt" }],
+    "preToolUse": [{ "command": "node .cursor/scripts/hook.js preToolUse" }],
+    "stop": [{ "command": "node .cursor/scripts/hook.js stop" }],
+    "sessionEnd": [{ "command": "node .cursor/scripts/hook.js sessionEnd" }]
+  }
+}

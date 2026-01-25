@@ -7,7 +7,8 @@ out/
 Thumbs.db
 
 # Cursor & AI Docs
-.cursor/
+.cursor/agents/
+.cursor/rules/
 .ai-contracts/
 design.md
 plan.md
