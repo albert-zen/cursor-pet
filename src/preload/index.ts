@@ -1,5 +1,11 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('api', {
-  // 后续添加状态检测 API
+  getAgentStatus: () => ipcRenderer.invoke('get-agent-status'),
+  onAgentStatus: (callback: (status: string) => void) => {
+    ipcRenderer.on('agent-status', (_e, status) => callback(status))
+  },
+  onSchemeChange: (callback: (scheme: string) => void) => {
+    ipcRenderer.on('scheme-change', (_e, scheme) => callback(scheme))
+  },
 })
