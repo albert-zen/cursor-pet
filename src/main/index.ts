@@ -11,6 +11,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 120,
     height: 120,
+    x: 100,
+    y: 100,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -22,8 +24,10 @@ function createWindow() {
     },
   })
 
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5173')
+  const url = process.env.ELECTRON_RENDERER_URL
+  if (url) {
+    mainWindow.loadURL(url)
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
   } else {
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }

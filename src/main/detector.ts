@@ -1,20 +1,17 @@
-import { readdirSync, statSync } from 'fs'
+import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 import { EventEmitter } from 'events'
 
 export type AgentStatus = 'idle' | 'working'
 
-const CURSOR_LOGS_DIR = join(
-  process.env.APPDATA || '',
-  'Cursor',
-  'logs'
-)
-const ACTIVE_THRESHOLD_MS = 30000 // 30秒内有更新视为工作中
+// Hooks 状态文件路径
+const STATE_FILE = join(process.env.APPDATA || '', 'cursor-status-pet', 'state.json')
+const IDLE_TIMEOUT_MS = 10000 // 10秒无活动视为空闲
 
 export class AgentDetector extends EventEmitter {
   private status: AgentStatus = 'idle'
   private timer: NodeJS.Timeout | null = null
-  private pollInterval = 2000
+  private pollInterval = 500 // 更快轮询
 
   getStatus(): AgentStatus {
     return this.status
@@ -42,41 +39,19 @@ export class AgentDetector extends EventEmitter {
 
   private detectStatus(): AgentStatus {
     try {
-      const logFile = this.findLatestAgentLog()
-      if (!logFile) return 'idle'
+      if (!existsSync(STATE_FILE)) return 'idle'
 
-      const stat = statSync(logFile)
-      const elapsed = Date.now() - stat.mtimeMs
-      return elapsed < ACTIVE_THRESHOLD_MS ? 'working' : 'idle'
+      const data = JSON.parse(readFileSync(STATE_FILE, 'utf-8'))
+      const elapsed = Date.now() - data.timestamp
+
+      // 如果状态文件标记为工作中且未超时
+      if (data.working && elapsed < IDLE_TIMEOUT_MS) {
+        return 'working'
+      }
+
+      return 'idle'
     } catch {
       return 'idle'
-    }
-  }
-
-  private findLatestAgentLog(): string | null {
-    try {
-      // 找最新的日志目录
-      const logDirs = readdirSync(CURSOR_LOGS_DIR)
-        .filter((d) => /^\d{8}T\d{6}$/.test(d))
-        .sort()
-        .reverse()
-
-      if (logDirs.length === 0) return null
-
-      const latestDir = join(CURSOR_LOGS_DIR, logDirs[0])
-      const extHostDir = join(latestDir, 'window1', 'exthost')
-
-      // 找 output_logging_* 目录
-      const outputDirs = readdirSync(extHostDir)
-        .filter((d) => d.startsWith('output_logging_'))
-        .sort()
-        .reverse()
-
-      if (outputDirs.length === 0) return null
-
-      return join(extHostDir, outputDirs[0], '1-Cursor Agent.log')
-    } catch {
-      return null
     }
   }
 }

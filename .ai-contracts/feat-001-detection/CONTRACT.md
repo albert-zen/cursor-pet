@@ -2,9 +2,10 @@
 
 ## 检测方案
 
-监控 Cursor Agent 日志文件活跃度：
-- 路径：`%APPDATA%\Cursor\logs\{最新时间戳}\window1\exthost\output_logging_{时间戳}\1-Cursor Agent.log`
-- 判断：文件最近 30 秒内有更新 = 工作中
+使用 Cursor 官方 Hooks API（https://cursor.com/cn/docs/agent/hooks）：
+- 配置：`~/.cursor/hooks.json`
+- Hook 事件：`sessionStart`、`preToolUse` → working；`sessionEnd`、`stop` → idle
+- 状态文件：`%APPDATA%/cursor-status-pet/state.json`
 
 ## 接口
 
