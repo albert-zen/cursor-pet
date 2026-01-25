@@ -16,7 +16,7 @@ export default function App() {
   }, [])
 
   return (
-    <div style={{ background: 'rgba(0,0,0,0.5)', width: '100vw', height: '100vh' }}>
+    <div style={{ width: '100vw', height: '100vh' }}>
       {scheme === 'A' ? <SchemeA status={status} /> : <SchemeB status={status} />}
       <style>{`
         * { margin: 0; padding: 0; box-sizing: border-box; }
