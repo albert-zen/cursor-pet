@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import SchemeA from './SchemeA'
 import SchemeB from './SchemeB'
+import SchemeCyberpunk from './SchemeCyberpunk'
+import SchemePixelCat from './SchemePixelCat'
 
 type Status = 'idle' | 'working'
-type Scheme = 'A' | 'B'
+type Scheme = 'A' | 'B' | 'Cyberpunk' | 'PixelCat'
 
 export default function App() {
   const [status, setStatus] = useState<Status>('idle')
@@ -12,14 +14,31 @@ export default function App() {
   useEffect(() => {
     window.api.getAgentStatus().then(setStatus)
     window.api.onAgentStatus(setStatus)
-    window.api.onSchemeChange(setScheme)
+    window.api.onSchemeChange((newScheme: string) => setScheme(newScheme as Scheme))
   }, [])
 
+  const renderScheme = () => {
+    switch (scheme) {
+      case 'A': return <SchemeA status={status} />
+      case 'B': return <SchemeB status={status} />
+      case 'Cyberpunk': return <SchemeCyberpunk status={status} />
+      case 'PixelCat': return <SchemePixelCat status={status} />
+      default: return <SchemeA status={status} />
+    }
+  }
+
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      {scheme === 'A' ? <SchemeA status={status} /> : <SchemeB status={status} />}
+    <div style={{ 
+      width: '100vw', 
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      {renderScheme()}
       <style>{`
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: transparent; overflow: hidden; }
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.6; }

@@ -10,7 +10,7 @@ if (process.platform === 'win32') {
 let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 const detector = new AgentDetector()
-let currentScheme: 'A' | 'B' = 'A'
+let currentScheme: 'A' | 'B' | 'Cyberpunk' | 'PixelCat' = 'A'
 let isQuitting = false
 
 function createWindow() {
@@ -88,6 +88,18 @@ async function createTray() {
         checked: currentScheme === 'B',
         click: () => setScheme('B'),
       },
+      {
+        label: '赛博朋克风格',
+        type: 'radio',
+        checked: currentScheme === 'Cyberpunk',
+        click: () => setScheme('Cyberpunk'),
+      },
+      {
+        label: '像素猫风格',
+        type: 'radio',
+        checked: currentScheme === 'PixelCat',
+        click: () => setScheme('PixelCat'),
+      },
       { type: 'separator' },
       { label: '退出', click: () => { isQuitting = true; app.quit() } },
     ])
@@ -97,9 +109,18 @@ async function createTray() {
   updateMenu()
 }
 
-function setScheme(scheme: 'A' | 'B') {
+function setScheme(scheme: 'A' | 'B' | 'Cyberpunk' | 'PixelCat') {
   currentScheme = scheme
   mainWindow?.webContents.send('scheme-change', scheme)
+  
+  // 根据不同方案调整窗口大小
+  if (scheme === 'Cyberpunk') {
+    mainWindow?.setSize(180, 80)
+  } else if (scheme === 'PixelCat') {
+    mainWindow?.setSize(140, 140)
+  } else {
+    mainWindow?.setSize(120, 120)
+  }
 }
 
 app.whenReady().then(async () => {
