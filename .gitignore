@@ -5,3 +5,11 @@ out/
 *.log
 .DS_Store
 Thumbs.db
+
+# Cursor & AI Docs
+.cursor/
+.ai-contracts/
+design.md
+plan.md
+spec.md
+AGENT.md
