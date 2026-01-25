@@ -4,23 +4,38 @@
 
 Windows 桌面应用，显示 Cursor Agent 工作状态。基于 Cursor Hooks API 检测状态，通过轮询 `%APPDATA%/cursor-status-pet/state.json`。
 
-## 当前问题
+技术栈：Electron 28 + TypeScript + React 18 + electron-vite
 
-**窗口消失**：应用启动后窗口立即消失，原因待查（透明窗口/window-all-closed/GPU）
+## 当前状态
+
+- 窗口/托盘功能正常（bugfix-window-disappear 分支已修复）
+- 状态检测模块就绪，但依赖 Cursor Hooks 写入 state.json
+- **Hooks 未验证**：需配置 `~/.cursor/hooks.json` 并重启 Cursor
 
 ## 关键文件
 
-- `src/main/index.ts` - 主进程，窗口+托盘
-- `src/main/detector.ts` - 状态检测，轮询 state.json
-- `src/renderer/App.tsx` - 渲染入口，SchemeA/B 切换
-- `~/.cursor/hooks.json` - Cursor Hooks 配置（需重启 Cursor 生效）
+- `src/main/index.ts` - 主进程，窗口+托盘+IPC
+- `src/main/detector.ts` - 状态检测，轮询 state.json（500ms）
+- `src/renderer/App.tsx` - 渲染入口
+- `src/renderer/SchemeA.tsx` - 方案A 圆形指示灯（灰空闲/绿工作）
+- `src/renderer/SchemeB.tsx` - 方案B 桌面宠物（😴/🤖）
 
-## 临时调试代码（需清理）
+## 状态检测机制
 
-- `main/index.ts:30` - openDevTools
-- `App.tsx:19` - 半透明背景
+```
+Cursor Hooks → hook.js → state.json → detector.ts → IPC → UI
+```
+
+state.json 格式：`{ "working": boolean, "timestamp": number }`
+超过 10 秒无更新视为空闲
+
+## 开发命令
+
+- `npm run dev` - 开发模式
+- `npm run build` - 构建
+- `npm run lint` - ESLint
 
 ## 开发规范
 
-- TypeScript + ESLint
+- TypeScript + ESLint + Prettier
 - 功能契约放 `.ai-contracts/<feature>/CONTRACT.md`
