@@ -9,6 +9,8 @@ Thumbs.db
 # Cursor & AI Docs
 .cursor/agents/
 .cursor/rules/
+.cursor/skills/
+.cursor/commands/
 .ai-contracts/
 design.md
 plan.md
